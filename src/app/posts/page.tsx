@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface Post {
   userId: number;
   id: number;
@@ -29,9 +31,10 @@ export default async function PostsPage() {
         </h2>
         <div className="space-y-4">
           {firstTenPosts.map((post) => (
-            <div
+            <Link
               key={post.id}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              href={`/posts/${post.id}`}
+              className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
@@ -48,7 +51,7 @@ export default async function PostsPage() {
                   </p>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
