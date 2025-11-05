@@ -1,24 +1,21 @@
 import { NextResponse } from "next/server";
 
-let products = [
-  { id: 1, title: "iPhone 14", category: "Electronics", price: 999 },
-  { id: 2, title: "MacBook Pro", category: "Electronics", price: 1999 },
-  { id: 3, title: "Coffee Mug", category: "Home", price: 12 },
-  { id: 4, title: "Gaming Mouse", category: "Electronics", price: 49 },
-];
+const BASE_URL = "https://fakestoreapi.com/products";
 
 export const GET = async () => {
   try {
+    const res = await fetch(BASE_URL);
+    const data = await res.json();
     return NextResponse.json({
       status: 200,
-      data: products,
-      count: products.length,
+      data,
+      count: data.length,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error fetching data:", error);
     return NextResponse.json({
-      message: "Error getting products",
-      status: 500,
+      error: "Error getting data",
+      status: 200,
     });
   }
 };
@@ -26,17 +23,20 @@ export const GET = async () => {
 export const POST = async (req: Request) => {
   try {
     const body = await req.json();
-    const newProduct = {
-      id: products.length ? products[products.length - 1].id + 1 : 1,
-      ...body,
-    };
-    products.push(newProduct);
-    return NextResponse.json(newProduct, { status: 201 });
+    const response = await fetch(BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const newProduct = await response.json();
+
+    return NextResponse.json(newProduct, { status: 200 });
   } catch (error) {
-    console.error("Error creating new product:", error);
+    console.error("Error fetching data:", error);
     return NextResponse.json({
-      error: "Error creating new products",
-      status: 500,
+      error: "Error getting data",
+      status: 200,
     });
   }
 };
@@ -44,25 +44,37 @@ export const POST = async (req: Request) => {
 export const PUT = async (req: Request) => {
   try {
     const body = await req.json();
-    const index = products.findIndex((p) => p.id === body.id);
-    if (index === -1)
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    products[index] = { ...products[index], ...body };
-    return NextResponse.json(products[index]);
+    const response = await fetch(`BASE_URL/${body.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const updatedProduct = await response.json();
+    return NextResponse.json(updatedProduct, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+    console.error("Error fetching data:", error);
+    return NextResponse.json({
+      error: "Invild data",
+      status: 400,
+    });
   }
 };
 
 export const DELETE = async (req: Request) => {
   try {
     const body = await req.json();
-    const index = products.findIndex((p) => p.id === body.id);
-    if (index === -1)
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    const deleted = products.splice(index, 1);
-    return NextResponse.json(deleted[0]);
+    const response = await fetch(`BASE_URL`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const deleted = await response.json();
+    return NextResponse.json(deleted, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    console.error("Error while deleting", error);
+    return NextResponse.json({
+      error: "Error while deleting the data",
+      status: 400,
+    });
   }
 };
